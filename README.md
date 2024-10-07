@@ -4,6 +4,6 @@
 
 Currently, here:
 
-- netifly app (https://jazzy-pie-cea24f.netlify.app)
+- netifly app ([https://jazzy-pie-cea24f.netlify.app])
 
 
