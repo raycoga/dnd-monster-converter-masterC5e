@@ -163,11 +163,18 @@ function transformarStringAtaque(input: string): string {
     // Reemplazar {@dice XdY + Z} por "XdY + Z"
     .replace(/{@dice ([0-9]+d[0-9]+(?: \+ \d+)?)}/g, (_, dice) => dice)
     // Reemplazar cualquier {@condition [condición]} por "[condición]"
-    .replace(/{@condition ([a-z A-Z]+)}/g, (_, condition) => condition)
+    .replace(/{@condition (.*?)}/g, (_, condition) => condition)
     // Reemplazar cualquier {@spell [hechizo]} por "[Hechizo]"
-    .replace(/{@spell ([a-z A-Z]+)}/g, (_, spell) => spell)
+    .replace(/{@spell (.*?)}/g, (_, spell) => spell)
+
+    // Reemplazar cualquier {@skill  [habilidad]} por "[habilidad]"
+    .replace(/{@skill (.*?)}/g, (_, skill) => skill)
+    // Reemplazar cualquier {@sense [sentido]} por "[sentido]"
+    .replace(/{@sense (.*?)}/g, (_, sense) => sense)
+    // Reemplazar cualquier {@note  [nota]} por "[nota]"
+    .replace(/{@note (.*?)}/g, (_, note) => note)
     // Reemplazar cualquier {@creature [criatura]} por "[criatura]"
-    .replace(/{@creature ([a-z A-Z]+)}/g, (_, spell) => spell);
+    .replace(/{@creature (.*?)}/g, (_, creature) => creature)
   return resultado;
 }
 
@@ -378,7 +385,7 @@ const App: React.FC = () => {
             if (entry.type === "entries") {
               entry.entries.forEach((entryText: any) => {
                 if (typeof entryText === "string") {
-                  variants.ele("text", entryText);
+                  variants.ele("text", transformarStringAtaque(entryText));
                 } else {
                   entryText.items.forEach((moreEntries: any) => {
                     variants.ele(
@@ -506,7 +513,7 @@ const App: React.FC = () => {
   };
 
   const handleTransform = () => {
-    xmlRawObject.ele("description", descriptionInfo);
+    xmlRawObject.ele("description", transformarStringAtaque(descriptionInfo));
     setXml(xmlRawObject.end({ pretty: true }));
   };
 
