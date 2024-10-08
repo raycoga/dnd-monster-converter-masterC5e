@@ -411,7 +411,7 @@ const App: React.FC = () => {
         const { conPrefijos, totalSlots, soloHechizos } =
           convertirSpellcastingEnArrays(json.spellcasting[0]);
         xmlObj.ele("slots", totalSlots);
-        conPrefijos.forEach((spell: any, key: number) => {
+        conPrefijos.forEach((spell: any) => {
           xmlObj.ele("text", spell);
         });
         soloHechizos.forEach((spell: any, key: number) => {
