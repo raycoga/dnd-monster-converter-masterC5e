@@ -316,6 +316,7 @@ const App: React.FC = () => {
             .join(", ")
         );
 
+
       // Agregar inmunidades
       if (json.immune)
         xmlObj.ele("immune", generarCadenaDeInmunidades(json.immune));
@@ -353,12 +354,19 @@ const App: React.FC = () => {
           createElement({ tag: "action", trait, xmlObj });
         });
       }
+        // Agregar bonus
+        if (json.bonus) {
+          json.bonus.forEach((trait: any) => {
+            createElement({ tag: "action", trait, xmlObj });
+          });
+        }
       // Agregar reacciones
       if (json.reaction) {
         json.reaction.forEach((trait: any) => {
           createElement({ tag: "reaction", trait, xmlObj });
         });
       }
+     
       // Agregar acciones legendarias
       if (json.legendary) {
         json.legendary.forEach((trait: any) => {
