@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {  useState } from "react";
 import { create } from "xmlbuilder";
 import calcularModificador from "../../utilities/calcularModificador";
 import capitalizarPrimeraLetra from "../../utilities/capitalizarPrimerLetra";
@@ -8,6 +8,7 @@ import createElement from "../../utilities/monsterUtilities/createElement";
 import convertirSpellcastingEnArrays from "../../utilities/monsterUtilities/convertirSpellcastinEnarrays";
 
 const useMonsterHooks = () => {
+
   const [xml, setXml] = useState<string>("");
   const [xmlRawObject, setxmlRawObject] = useState<any>(create("monster"));
   const convertJsonToXml = (jsonString: string) => {
@@ -303,7 +304,7 @@ const useMonsterHooks = () => {
       setXml(""); // O manejar el error como prefieras
     }
   };
-  
+
   return { xml, xmlRawObject, setXml, convertJsonToXml };
 };
 export default useMonsterHooks;
