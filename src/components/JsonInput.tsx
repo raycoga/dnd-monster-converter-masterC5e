@@ -32,19 +32,21 @@ const JsonInput: React.FC<JsonInputProps> = ({
 
   return (
     <div className="input-container">
-      <h2>Input JSON</h2>
-      <button onClick={clean}>Limpiar</button>
+      <h2 style={{margin:0}}>
+        Input JSON{' '}
+        <button onClick={clean}>Limpiar</button>
+      </h2>
       <textarea
         value={inputValue}
         onChange={handleChange}
-        rows={30}
+        rows={15}
         cols={50}
       />
       Agregar mas descripcion
       <textarea
         value={inputValue2}
         onChange={handleChangetwo}
-        rows={30}
+        rows={15}
         cols={50}
       />
     </div>

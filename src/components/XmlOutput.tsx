@@ -24,10 +24,10 @@ const XmlOutput: React.FC<XmlOutputProps> = ({ xml }) => {
   };
   return (
     <div className="output-container">
-      <h2>Output XML</h2>
-      <button onClick={copyToClipboard} style={styles.button}>
+      <h2>Output XML {' '} <button onClick={copyToClipboard} style={styles.button}>
         Copiar Contenido
-      </button>
+      </button></h2>
+     
       {copyStatus && <p style={styles.status}>{copyStatus}</p>}{" "}
       {/* Mostrar estado */}
       <pre
