@@ -1,48 +1,224 @@
 // src/App.tsx
 import React, { useState } from "react";
-/* import * as xmlbuilder from 'xmlbuilder'; */
 import { create } from "xmlbuilder";
 import JsonInput from "./JsonInput";
 import XmlOutput from "./XmlOutput";
 
-const App: React.FC = () => {
-  const [xml, setXml] = useState<string>("");
-
- /*  const convertJsonToXml = (json: any) => {
-    const root = xmlbuilder.create('monster');
-
-    const addPropertiesToXml = (obj: any, parent: any) => {
-      for (const key in obj) {
-        if (Array.isArray(obj[key])) {
-          const arrayElement = parent.ele(key);
-          obj[key].forEach((item: any) => {
-            if (typeof item === 'object') {
-              addPropertiesToXml(item, arrayElement);
-            } else {
-              arrayElement.ele('item', item);
-            }
-          });
-        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-          const child = parent.ele(key);
-          addPropertiesToXml(obj[key], child);
-        } else {
-          parent.ele(key, obj[key]);
-        }
-      }
+type ImmuneEntry =
+  | string
+  | {
+      immune: string[];
+      note?: string;
+      cond?: boolean;
     };
 
-    addPropertiesToXml(json, root);
-    setXml(root.end({ pretty: true }))
-  
-  }; */
+type Spellcasting = {
+  name: string;
+  type: string;
+  headerEntries: string[];
+  will?: string[]; // Hechizos a voluntad
+  daily?: {
+    [key: string]: string[]; // Hechizos diarios
+  };
+  spells?: {
+    [level: string]: {
+      slots?: number;
+      spells: string[];
+    };
+  };
+  ability: string;
+};
 
+const createElement = ({ tag, trait, xmlObj }: any) => {
+  const OBJECT = xmlObj.ele(tag);
+  OBJECT.ele("name", transformarStringAtaque(trait.name));
+  trait.entries.forEach((entry: string | any) => {
+    if (typeof entry === "string") {
+      OBJECT.ele("text", transformarStringAtaque(entry));
+    } else if (entry.items) {
+      entry.items.forEach((item: string | any) => {
+        OBJECT.ele("text", transformarStringAtaque(item.name));
+        OBJECT.ele("text", transformarStringAtaque(item.entries.join("")));
+      });
+    }
+  });
+  OBJECT.ele(
+    "attack",
+    `${transformarStringAtaque(trait.name)}${transformarAtaqueAFormatoBreve(
+      transformarStringAtaque(trait.entries.join(","))
+    )}`
+  );
+};
 
- const convertJsonToXml = (jsonString: string) => {
-  if(jsonString==='') return setXml('')
+function convertirSpellcastingEnArrays(spellcasting: Spellcasting): {
+  soloHechizos: string[];
+  conPrefijos: string[];
+  totalSlots: number;
+} {
+  // Reemplazo del marcador {@dc} y {@hit} en el header
+  const header = spellcasting.headerEntries[0]
+    .replace(/{@dc (\d+)}/g, (_, dc) => `DC ${dc}`)
+    .replace(/{@hit (\d+)}/g, (_, hit) => `+${hit}`);
+
+  const soloHechizos: string[] = [`Spellcasting. ${header}`];
+  const conPrefijos: string[] = [`Spellcasting. ${header}`];
+  let totalSlots = 0;
+
+  // Función para limpiar los marcadores {@spell} en los nombres de los hechizos
+  const limpiarSpell = (spell: string) =>
+    spell.replace(/{@spell (.*?)}/g, (_, spellName) => spellName);
+
+  // Si existen hechizos a voluntad (will)
+  if (spellcasting.will) {
+    const hechizosWill = spellcasting.will.map(limpiarSpell).join(", ");
+    soloHechizos.push(`${hechizosWill}`); // Solo los nombres de los hechizos
+    conPrefijos.push(`At will: ${hechizosWill}`); // Con el prefijo "At will"
+  }
+
+  // Si existen hechizos diarios (daily)
+  if (spellcasting.daily) {
+    for (const frecuencia in spellcasting.daily) {
+      const frecuenciaHechizos = spellcasting.daily[frecuencia]
+        .map(limpiarSpell)
+        .join(", ");
+      soloHechizos.push(`${frecuenciaHechizos}`); // Solo los nombres de los hechizos
+      conPrefijos.push(`${frecuencia}/day each: ${frecuenciaHechizos}`); // Con el prefijo "1/day each", "2/day each", etc.
+    }
+  }
+
+  // Si existen hechizos por nivel (spells)
+  if (spellcasting.spells) {
+    for (const nivel in spellcasting.spells) {
+      const nivelData = spellcasting.spells[nivel];
+      const nivelNombre =
+        nivel === "0"
+          ? "Cantrips (at will)"
+          : `${nivel}st level (${nivelData.slots} slots)`;
+
+      // Limpiar los nombres de los hechizos
+      const hechizos = nivelData.spells.map(limpiarSpell).join(", ");
+
+      // Añadir solo los nombres de los hechizos
+      soloHechizos.push(`${hechizos}`);
+
+      // Añadir la línea con prefijo
+      conPrefijos.push(`${nivelNombre}: ${hechizos}`);
+
+      // Sumar los slots si existen
+      if (nivelData.slots) {
+        totalSlots += nivelData.slots;
+      }
+    }
+  }
+
+  return { soloHechizos, conPrefijos, totalSlots };
+}
+
+function transformarAtaqueAFormatoBreve(input: string): string {
+  // Expresión regular para capturar el valor de hit y el daño
+  const hitRegex = /\+(\d+) to hit/;
+  const damageRegex = /\((\d+d\d+ \+ \d+)\)/;
+
+  // Extraer el valor de hit
+  const hitMatch = input.match(hitRegex);
+  const hitValue = hitMatch ? `+${hitMatch[1]}` : "";
+
+  // Extraer el valor de daño
+  const damageMatch = input.match(damageRegex);
+  const damageValue = damageMatch ? damageMatch[1].replace(/\s+/g, "") : "";
+
+  // Devolver el resultado en el formato solicitado
+  if (hitValue?.length > 0 && damageValue?.length > 0)
+    return `|${hitValue}|${damageValue}`;
+  return "";
+}
+
+function transformarStringAtaque(input: string): string {
+  if (input === "" || input === undefined || input === null) return "";
+
+  // Reemplazos básicos
+  let resultado = input
+    // Reemplazar {@atk mw,rw}, {@atk mw}, o {@atk rw} por su equivalente
+    .replace(/{@atk (mw|rw|rs|ms)(,rw|,mw|,rs|,ms)?}/g, (_, tipo1, tipo2) => {
+      if (tipo1 === "mw" && tipo2 === ",rw")
+        return "Melee or Ranged Weapon Attack";
+      if (tipo1 === "ms" && tipo2 === ",rs")
+        return "Melee or Ranged Spell Attack";
+      if (tipo1 === "ms") return "Melee Spell Attack";
+      if (tipo1 === "mw") return "Melee Weapon Attack";
+      if (tipo1 === "rs") return "Ranged Spell Attack";
+      if (tipo1 === "rw") return "Ranged Weapon Attack";
+      return ""; // Para manejar casos inesperados
+    })
+    // Reemplazar {@hit X} por "+X to hit"
+    .replace(/{@hit (\d+)}/g, (_, hit) => `+${hit} to hit`)
+    // Reemplazar {@h} por "Hit:"
+    .replace(/{@h}/g, "Hit:")
+    // Reemplazar {@damage XdY + Z} por "XdY + Z"
+    .replace(/{@damage ([0-9]+d[0-9]+(?: \+ \d+)?)}/g, (_, damage) => damage)
+    // Reemplazar {@recharge X} por "(Recharge X–6)"
+    .replace(/{@recharge (\d)}/g, (_, recarga) => `(Recharge ${recarga}–6)`)
+    // Reemplazar {@dc X} por "DC X" para las tiradas de salvación
+    .replace(/{@dc (\d+)}/g, (_, dc) => `DC ${dc}`)
+    // Reemplazar {@dice XdY + Z} por "XdY + Z"
+    .replace(/{@dice ([0-9]+d[0-9]+(?: \+ \d+)?)}/g, (_, dice) => dice)
+    // Reemplazar cualquier {@condition [condición]} por "[condición]"
+    .replace(/{@condition ([a-z A-Z]+)}/g, (_, condition) => condition)
+    // Reemplazar cualquier {@spell [hechizo]} por "[Hechizo]"
+    .replace(/{@spell ([a-z A-Z]+)}/g, (_, spell) => spell)
+    // Reemplazar cualquier {@creature [criatura]} por "[criatura]"
+    .replace(/{@creature ([a-z A-Z]+)}/g, (_, spell) => spell);
+  return resultado;
+}
+
+function generarCadenaDeInmunidades(immuneList: ImmuneEntry[]): string {
+  let inmunidades: string[] = [];
+  let note = "";
+
+  immuneList.forEach((entry) => {
+    if (typeof entry === "string") {
+      // Si es una cadena, la añadimos a la lista de inmunidades
+      inmunidades.push(entry);
+    } else if (typeof entry === "object" && entry.immune) {
+      // Si es un objeto con una lista de inmunidades, las unimos
+      inmunidades.push(entry.immune.join(", "));
+
+      // Si existe el atributo "note", lo almacenamos
+      if (entry.note) {
+        note = entry.note;
+      }
+    }
+  });
+
+  // Creamos la cadena final
+  const resultado =
+    inmunidades.length > 1
+      ? `${inmunidades.slice(0, -1).join(", ")} and ${
+          inmunidades[inmunidades.length - 1]
+        }`
+      : inmunidades.join("");
+
+  // Añadimos la nota si existe
+  return note ? `${resultado} ${note}` : resultado;
+}
+
+function calcularModificador(puntuacion: number): number {
+  return Math.floor((puntuacion - 10) / 2);
+}
+function capitalizarPrimeraLetra(palabra: string): string {
+  if (!palabra) return ""; // Verifica si la cadena está vacía
+  return palabra.charAt(0).toUpperCase() + palabra.slice(1);
+}
+
+const App: React.FC = () => {
+  const [xml, setXml] = useState<string>("");
+  const [xmlRawObject, setxmlRawObject] = useState<any>(create("monster"));
+  const [descriptionInfo, setdescriptionInfo] = useState("");
+  const convertJsonToXml = (jsonString: string) => {
+    if (jsonString === "") return setXml("");
     try {
       const json = JSON.parse(jsonString);
-      const xmlObj = create("Monster");
-
+      const xmlObj = create("monster");
       // Agregar propiedades básicas
       xmlObj.ele("name", json.name);
       xmlObj.ele("source", json.source);
@@ -51,7 +227,7 @@ const App: React.FC = () => {
 
       // Agregar tamaño y tipo
       xmlObj.ele("size", json.size[0]);
-      xmlObj.ele("type", json.type.type);
+      if (json.type.type) xmlObj.ele("type", json.type.type);
       if (json.type.tags) {
         xmlObj.ele("tags", json.type.tags.join(", "));
       }
@@ -60,131 +236,169 @@ const App: React.FC = () => {
       if (json.alignment) xmlObj.ele("alignment", json.alignment.join(", "));
 
       // Agregar armadura y puntos de vida
-      xmlObj.ele("ac", json.ac[0].ac);
-      xmlObj.ele("hp", json.hp.average);
-      xmlObj.ele("hpFormula", json.hp.formula);
+      xmlObj.ele(
+        "ac",
+        `${json.ac[0].ac ? json.ac[0].ac : json.ac[0]} (${
+          json?.ac[0]?.from ? json.ac[0].from[0] : ""
+        })`
+      );
+      xmlObj.ele("hp", `${json.hp.average} (${json.hp.formula})`);
 
       // Agregar velocidad
-      const speed = xmlObj.ele("speed");
-      if (json.speed.walk) speed.ele("walk", json.speed.walk);
-      if (json.speed.burrow) speed.ele("burrow", json.speed.burrow);
-      if (json.speed.fly) speed.ele("fly", json.speed.fly);
-      if (json.speed.swim) speed.ele("swim", json.speed.swim);
-      if (json.speed.climb) speed.ele("climb", json.speed.climb);
+      let speedString = "";
+      if (json.speed.walk)
+        speedString += `walk ${
+          json.speed.walk.number ? json.speed.walk.number : json.speed.walk
+        },`;
+      if (json.speed.burrow)
+        speedString += `burrow ${
+          json.speed.burrow.number
+            ? json.speed.burrow.number
+            : json.speed.burrow
+        }, `;
+      if (json.speed.fly)
+        speedString += `fly ${
+          json.speed.fly.number ? json.speed.fly.number : json.speed.fly
+        } `;
+      if (json.speed.swim)
+        speedString += `swim ${
+          json.speed.swim.number ? json.speed.swim.number : json.speed.swim
+        } `;
+      if (json.speed.climb)
+        speedString += `climb ${
+          json.speed.climb.number ? json.speed.climb.number : json.speed.climb
+        } `;
+      xmlObj.ele("speed", speedString);
+
+      // Agregar iniciativa
+      if (json.dex)
+        xmlObj.ele(
+          "init",
+          `${calcularModificador(json.dex)} (${
+            calcularModificador(json.dex) + 10
+          })`
+        );
 
       // Agregar atributos
-      const attributes = xmlObj.ele("attributes");
-      attributes.ele("str", json.str);
-      attributes.ele("dex", json.dex);
-      attributes.ele("con", json.con);
-      attributes.ele("int", json.int);
-      attributes.ele("wis", json.wis);
-      attributes.ele("cha", json.cha);
+      if (json.str) xmlObj.ele("str", { class: "hola" }, json.str);
+      if (json.dex) xmlObj.ele("dex", json.dex);
+      if (json.con) xmlObj.ele("con", json.con);
+      if (json.int) xmlObj.ele("int", json.int);
+      if (json.wis) xmlObj.ele("wis", json.wis);
+      if (json.cha) xmlObj.ele("cha", json.cha);
 
       // Agregar salvaciones
-      const saves = xmlObj.ele("savingThrows");
       if (json.save)
-        Object.entries(json.save).forEach(([key, value]: any) => {
-          saves.ele(key, value);
-        });
+        xmlObj.ele(
+          "save",
+          Object.entries(json.save)
+            .map(
+              ([clave, valor]) => `${capitalizarPrimeraLetra(clave)}: ${valor}`
+            )
+            .join(", ")
+        );
 
       // Agregar habilidades
-      const skills = xmlObj.ele("skills");
       if (json.skill)
-        Object.entries(json.skill).forEach(([key, value]: any) => {
-          skills.ele(key, value);
-        });
- // Agregar pasiva
- if (json.passive)xmlObj.ele("passive", json.passive);
-      // Agregar sentidos
-      const senses = xmlObj.ele("senses");
-      if (json.senses)
-        json.senses.forEach((sense: string) => senses.ele("sense", sense));
+        xmlObj.ele(
+          "skill",
+          Object.entries(json.skill)
+            .map(
+              ([clave, valor]) => `${capitalizarPrimeraLetra(clave)}: ${valor}`
+            )
+            .join(", ")
+        );
 
       // Agregar inmunidades
-      const immune = xmlObj.ele("immunities");
       if (json.immune)
-        json.immune.forEach((item: string) => immune.ele("immune", item));
+        xmlObj.ele("immune", generarCadenaDeInmunidades(json.immune));
 
       // Agregar inmunidades a condiciones
-      const conditionImmune = xmlObj.ele("conditionImmunities");
       if (json.conditionImmune)
-        json.conditionImmune.forEach((item: string) =>
-          conditionImmune.ele("conditionImmune", item)
+        xmlObj.ele(
+          "conditionImmune",
+          generarCadenaDeInmunidades(json.conditionImmune)
         );
 
+      // Agregar senses
+      if (json.senses) xmlObj.ele("senses", json.senses.join(", "));
+
+      // Agregar pasiva
+      if (json.passive) xmlObj.ele("passive", json.passive);
+
       // Agregar idiomas
-      const languages = xmlObj.ele("languages");
-      if (json.languages)
-        json.languages.forEach((language: string) =>
-          languages.ele("language", language)
-        );
+      if (json.languages) xmlObj.ele("languages", json.languages.join(", "));
 
       // Agregar rasgos
       if (json.trait) {
-        const traits = xmlObj.ele("traits");
         json.trait.forEach((trait: any) => {
-          const traitElement = traits.ele("trait", { name: trait.name });
+          const traits = xmlObj.ele("trait");
+          traits.ele("name", trait.name);
           trait.entries.forEach((entry: string) => {
-            traitElement.ele("entry", entry);
+            traits.ele("text", transformarStringAtaque(entry));
           });
         });
       }
 
       // Agregar acciones
       if (json.action) {
-        const actions = xmlObj.ele("actions");
-        json.action.forEach((action: any) => {
-          const actionElement = actions.ele("action", { name: action.name });
-          action.entries.forEach((entry: string) => {
-            actionElement.ele("entry", entry);
-          });
+        json.action.forEach((trait: any) => {
+          createElement({ tag: "action", trait, xmlObj });
         });
       }
-
+      // Agregar reacciones
+      if (json.reaction) {
+        json.reaction.forEach((trait: any) => {
+          createElement({ tag: "reaction", trait, xmlObj });
+        });
+      }
       // Agregar acciones legendarias
       if (json.legendary) {
-        const legendaryActions = xmlObj.ele("legendaryActions");
-        json.legendary.forEach((legendary: any) => {
-          const legendaryElement = legendaryActions.ele("legendaryAction", {
-            name: legendary.name,
-          });
-          legendary.entries.forEach((entry: string) => {
-            legendaryElement.ele("entry", entry);
-          });
+        json.legendary.forEach((trait: any) => {
+          createElement({ tag: "legendary", trait, xmlObj });
         });
       }
-   // Agregar ambiente
-   if (json.environment) {
-    const environment = xmlObj.ele("environment");
-    json.environment.forEach((env: string) => environment.ele("type", env));
-}
-// Agregar sonido
-if (json.soundClip) {
-const soundClip = xmlObj.ele("soundClip");
-soundClip.ele("type", json.soundClip.type);
-soundClip.ele("path", json.soundClip.path);
-}
+      // Agregar ambiente
+      if (json.environment) {
+        const environment = xmlObj.ele("environment");
+        json.environment.forEach((env: string) => environment.ele("type", env));
+      }
+      // Agregar sonido
+      if (json.soundClip) {
+        const soundClip = xmlObj.ele("soundClip");
+        soundClip.ele("type", json.soundClip.type);
+        soundClip.ele("path", json.soundClip.path);
+      }
       // Agregar variantes
       if (json.variant) {
-        const variants = xmlObj.ele("variants");
+        const variants = xmlObj.ele("description");
         json.variant.forEach((variant: any) => {
-          const variantElement = variants.ele("variant", {
-            type: variant.type,
-            name: variant.name,
-          });
+          variants.ele("text", transformarStringAtaque(variant.name));
           variant.entries.forEach((entry: any) => {
             if (entry.type === "entries") {
-              entry.entries.forEach((entryText: string) => {
-                variantElement.ele("entry", entryText);
+              entry.entries.forEach((entryText: any) => {
+                if (typeof entryText === "string") {
+                  variants.ele("text", entryText);
+                } else {
+                  entryText.items.forEach((moreEntries: any) => {
+                    variants.ele(
+                      "text",
+                      transformarStringAtaque(moreEntries.name)
+                    );
+                    variants.ele(
+                      "text",
+                      transformarStringAtaque(moreEntries.entries.join(""))
+                    );
+                  });
+                }
               });
             } else if (entry.type === "list") {
               entry.items.forEach((item: any) => {
-                const itemElement = variantElement.ele("item", {
+                const itemElement = variants.ele("item", {
                   name: item.name,
                 });
                 item.entries.forEach((itemEntry: string) => {
-                  itemElement.ele("entry", itemEntry);
+                  itemElement.ele("text", transformarStringAtaque(itemEntry));
                 });
               });
             }
@@ -193,19 +407,20 @@ soundClip.ele("path", json.soundClip.path);
       }
 
       // Agregar hechizos
-      if (json.spells) {
-        const spells = xmlObj.ele("spells");
-        json.spells.forEach((spell: any) => {
-          const spellElement = spells.ele("spell", {
-            name: spell.name,
-            level: spell.level,
-          });
-          spell.entries.forEach((entry: string) => {
-            spellElement.ele("entry", entry);
-          });
+      if (json.spellcasting) {
+        const { conPrefijos, totalSlots, soloHechizos } =
+          convertirSpellcastingEnArrays(json.spellcasting[0]);
+        xmlObj.ele("slots", totalSlots);
+        conPrefijos.forEach((spell: any, key: number) => {
+          xmlObj.ele("text", spell);
+        });
+        soloHechizos.forEach((spell: any, key: number) => {
+          if (key !== 0) {
+            xmlObj.ele("spells", spell);
+          }
         });
       }
-      
+
       // Agregar rasgos de clase
       if (json.features) {
         const features = xmlObj.ele("features");
@@ -278,20 +493,32 @@ soundClip.ele("path", json.soundClip.path);
       xmlObj.ele("hasFluffImages", json.hasFluffImages ? "true" : "false");
 
       // Finalizar y establecer XML
-      setXml(xmlObj.end({ pretty: true }));
+      setxmlRawObject(xmlObj);
+      /* setXml(xmlObj.end({ pretty: true })); */
     } catch (error) {
       console.error("Error converting JSON to XML:", error);
       setXml(""); // O manejar el error como prefieras
     }
-  }; 
+  };
 
+  const moreDataChange = (value: string) => {
+    setdescriptionInfo(value);
+  };
 
+  const handleTransform = () => {
+    xmlRawObject.ele("description", descriptionInfo);
+    setXml(xmlRawObject.end({ pretty: true }));
+  };
 
   return (
     <div>
       <h1>JSON to XML Converter for Game Master 5</h1>
       <div className="body">
-        <JsonInput onJsonChange={convertJsonToXml} />
+        <JsonInput
+          onJsonChange={convertJsonToXml}
+          moreDataChange={moreDataChange}
+        />
+        <button onClick={handleTransform}>transformar</button>
         <XmlOutput xml={xml} />
       </div>
     </div>
