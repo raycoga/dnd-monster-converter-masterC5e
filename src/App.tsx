@@ -20,7 +20,7 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <h1>JSON to XML Converter for Game Master 5</h1>
+      <h1>5Etools JSONs to XML Converter for Game Master 5</h1>
       <div className="body">
         <JsonInput
           onJsonChange={convertJsonToXml}
