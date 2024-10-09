@@ -126,6 +126,7 @@ const useMonsterHooks = () => {
       // Agregar idiomas
       if (json.languages) xmlObj.ele("languages", json.languages.join(", "));
 
+
       // Agregar rasgos
       if (json.trait) {
         json.trait.forEach((trait: any) => {
@@ -164,8 +165,7 @@ const useMonsterHooks = () => {
       }
       // Agregar ambiente
       if (json.environment) {
-        const environment = xmlObj.ele("environment");
-        json.environment.forEach((env: string) => environment.ele("type", env));
+        xmlObj.ele("environment", json.environment.join(', '));
       }
       // Agregar sonido
       if (json.soundClip) {

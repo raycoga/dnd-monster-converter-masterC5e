@@ -40,6 +40,8 @@ function transformarStringAtaque(input: string): string {
     .replace(/{@note (.*?)}/g, (_, note) => note)
     // Reemplazar cualquier {@creature [criatura]} por "[criatura]"
     .replace(/{@creature (.*?)}/g, (_, creature) => creature)
+        // Reemplazar cualquier {@status [status]} por "[status]"
+        .replace(/{@status (.*?)}/g, (_, creature) => creature)
   return resultado;
 }
 
