@@ -26,7 +26,7 @@ function transformarStringAtaque(input: string): string {
     // Reemplazar {@dc X} por "DC X" para las tiradas de salvación
     .replace(/{@dc (\d+)}/g, (_, dc) => `DC ${dc}`)
     // Reemplazar {@dice XdY + Z} por "XdY + Z"
-    .replace(/{@dice ([0-9]+d[0-9]+(?: \+ \d+)?)}/g, (_, dice) => dice)
+    .replace(/{@dice (.*?)}/g, (_, dice) => dice)
     // Reemplazar cualquier {@condition [condición]} por "[condición]"
     .replace(/{@condition (.*?)}/g, (_, condition) => condition)
     // Reemplazar cualquier {@spell [hechizo]} por "[Hechizo]"

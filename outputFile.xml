@@ -1,5 +1,291 @@
 <?xml version="1.0"?>
 <compendium xmlns:exsl="http://exslt.org/common" version="5" auto_indent="NO">
 
+<monster>
+  <name>Duskthorn Dryad</name>
+  <source>ToB1-2023</source>
+  <cr>3</cr>
+  <page>150</page>
+  <size>M</size>
+  <alignment>C, N</alignment>
+  <ac>17 (natural armor)</ac>
+  <hp>77 (14d8 + 14)</hp>
+  <speed>walk 30,</speed>
+  <init>5 (15)</init>
+  <str class="hola">10</str>
+  <dex>20</dex>
+  <con>13</con>
+  <int>14</int>
+  <wis>15</wis>
+  <cha>24</cha>
+  <save>Con: +3, Wis: +4</save>
+  <skill>Animal handling: +4, Deception: +9, Nature: +6, Perception: +4, Persuasion: +9, Stealth: +7</skill>
+  <senses>darkvision 60 ft.</senses>
+  <passive>14</passive>
+  <languages>Common, Elvish, Sylvan, Umbral</languages>
+  <trait>
+    <name>Magic Resistance</name>
+    <text>The dryad has advantage on saving throws against spells and other magical effects.</text>
+  </trait>
+  <trait>
+    <name>Speak with Beasts and Plants</name>
+    <text>The dryad can communicate with beasts and plants as if they shared a language.</text>
+  </trait>
+  <trait>
+    <name>Tree Stride</name>
+    <text>Once on her turn, the dryad can use 10 feet of her movement to step magically into one dead tree within her reach and emerge from a second dead tree within 60 feet of the first tree, appearing in an unoccupied space within 5 feet of the second tree. Both trees must be Large or bigger.</text>
+  </trait>
+  <action>
+    <name>Multiattack</name>
+    <text>The duskthorn dryad makes two Thorned Slam or Thorn attacks.</text>
+    <attack>Multiattack</attack>
+  </action>
+  <action>
+    <name>Thorned Slam</name>
+    <text>Melee Weapon Attack +7 to hit to hit, reach 5 ft., one target. Hit:12 (2d6 + 5) piercing damage.</text>
+    <attack>Thorned Slam|+7|2d6+5</attack>
+  </action>
+  <action>
+    <name>Thorn</name>
+    <text>Ranged Weapon Attack +7 to hit to hit, range 80/320 ft., one target. Hit:10 (2d4 + 5) piercing damage.</text>
+    <attack>Thorn|+7|2d4+5</attack>
+  </action>
+  <action>
+    <name>Children of the Forest (1/Day)</name>
+    <text>The dryad magically calls 1d4 boars, constrictor snakes, or wolves, or it calls 1 child of the briar. The called creatures arrive in 1d4 rounds, acting as allies of the dryad and obeying her spoken commands. The creatures remain for 1 hour, until the dryad dies, or until the dryad dismisses them as a bonus action.</text>
+    <attack>Children of the Forest (1/Day)</attack>
+  </action>
+  <environment>forest</environment>
+  <slots>0</slots>
+  <text>Spellcasting. The dryad casts one of the following spells, requiring no material components and using Charisma as the spellcasting ability (spell save DC 17):</text>
+  <text>At will: druidcraft</text>
+  <text>3e/day each: charm person, entangle, invisibility</text>
+  <text>1e/day each: barkskin, spike growth, suggestion</text>
+  <spells>druidcraft</spells>
+  <spells>charm person, entangle, invisibility</spells>
+  <spells>barkskin, spike growth, suggestion</spells>
+  <traitTags>
+    <tag>Magic Resistance</tag>
+    <tag>Tree Stride</tag>
+  </traitTags>
+  <senseTags>
+    <tag>D</tag>
+  </senseTags>
+  <actionTags>
+    <tag>Multiattack</tag>
+  </actionTags>
+  <languageTags>
+    <tag>C</tag>
+    <tag>E</tag>
+    <tag>S</tag>
+  </languageTags>
+  <damageTags>
+    <tag>P</tag>
+  </damageTags>
+  <miscTags>
+    <tag>MW</tag>
+    <tag>RW</tag>
+  </miscTags>
+  <hasToken>true</hasToken>
+  <hasFluff>true</hasFluff>
+  <hasFluffImages>true</hasFluffImages>
+  <description/>
+</monster>
+
+
+
+<monster>
+  <name>Dunbarrow Witch</name>
+  <source>MCV4EC</source>
+  <cr>5</cr>
+  <page/>
+  <size>M</size>
+  <type>humanoid</type>
+  <tags>human</tags>
+  <alignment>N, E</alignment>
+  <ac>12 ()</ac>
+  <hp>72 (16d8)</hp>
+  <speed>walk 30,</speed>
+  <init>2 (12)</init>
+  <str class="hola">12</str>
+  <dex>14</dex>
+  <con>11</con>
+  <int>16</int>
+  <wis>15</wis>
+  <cha>20</cha>
+  <save>Wis: +5, Cha: +8</save>
+  <skill>Arcana: +6, Nature: +6</skill>
+  <passive>12</passive>
+  <languages>Common, Sylvan, and any one language</languages>
+  <action>
+    <name>Multiattack</name>
+    <text>The witch makes two Poison Dagger attacks. It can replace one of these attacks with Spellcasting.</text>
+    <attack>Multiattack</attack>
+  </action>
+  <action>
+    <name>Poison Dagger</name>
+    <text>Melee or Ranged Weapon Attack +5 to hit to hit, reach 5 ft. or range 20/60 ft., one target. Hit:4 (1d4 + 2) piercing damage plus 21 (6d6) poison damage.</text>
+    <attack>Poison Dagger|+5|1d4+2</attack>
+  </action>
+  <action>
+    <name>Polymorph Concoction (1/Day)</name>
+    <text>The witch hurls a bottle of liquid at a point up to 20 feet away from itself, which shatters into a cloud of magical smoke that fills a 10-foot-radius sphere. Each creature in that area must succeed on a DC 16 Wisdom saving throw or transform into a creature, as if under the effects of a polymorph spell, transforming into one of the following forms (roll a {@dice d4}): 1, bat; 2, frog; 3, lizard; or 4, rat. This transformation lasts for 1 hour or until the creature drops to 0 hit points in its new form.</text>
+    <attack>Polymorph Concoction (1/Day)</attack>
+  </action>
+  <action>
+    <name>Shattered Shards</name>
+    <text>The witch targets a point it can see within 30 feet of itself. The air there magically solidifies into a mirrorlike pane, then shatters in a 15-foot cone originating from that point. Each creature in that area must make a DC 16 Dexterity saving throw, taking 25 (10d4) force damage on a failed save, or half as much damage on a successful one.</text>
+    <attack>Shattered Shards</attack>
+  </action>
+  <slots>0</slots>
+  <text>Spellcasting. The witch casts one of the following spells, using Charisma as the spellcasting ability (spell save DC 16):</text>
+  <text>At will: mage armor (self only), prestidigitation</text>
+  <text>2e/day each: animal messenger, charm person, Tasha's hideous laughter</text>
+  <text>1e/day each: bestow curse, dispel magic</text>
+  <spells>mage armor (self only), prestidigitation</spells>
+  <spells>animal messenger, charm person, Tasha's hideous laughter</spells>
+  <spells>bestow curse, dispel magic</spells>
+  <actionTags>
+    <tag>Multiattack</tag>
+  </actionTags>
+  <languageTags>
+    <tag>C</tag>
+    <tag>S</tag>
+    <tag>X</tag>
+  </languageTags>
+  <damageTags>
+    <tag>I</tag>
+    <tag>O</tag>
+    <tag>P</tag>
+  </damageTags>
+  <miscTags>
+    <tag>AOE</tag>
+    <tag>MLW</tag>
+    <tag>MW</tag>
+    <tag>RW</tag>
+    <tag>THW</tag>
+  </miscTags>
+  <savingThrowForced>
+    <throwType>dexterity</throwType>
+    <throwType>wisdom</throwType>
+  </savingThrowForced>
+  <hasToken>true</hasToken>
+  <hasFluff>true</hasFluff>
+  <hasFluffImages>true</hasFluffImages>
+  <description/>
+</monster>
+
+<monster>
+  <name>Hollow Dragon</name>
+  <source>FTD</source>
+  <cr>18</cr>
+  <page>206</page>
+  <size>H</size>
+  <alignment>A</alignment>
+  <ac>19 (natural armor)</ac>
+  <hp>241 (21d12 + 105)</hp>
+  <speed>walk 40,fly 80 </speed>
+  <init>1 (11)</init>
+  <str class="hola">23</str>
+  <dex>12</dex>
+  <con>21</con>
+  <int>16</int>
+  <wis>13</wis>
+  <cha>21</cha>
+  <save>Con: +11, Int: +9, Wis: +7, Cha: +11</save>
+  <skill>Arcana: +9, History: +15, Perception: +13</skill>
+  <immune>poison and radiant</immune>
+  <conditionImmune>charmed, deafened, exhaustion, frightened, paralyzed and poisoned</conditionImmune>
+  <senses>blindsight 60 ft., darkvision 120 ft.</senses>
+  <passive>23</passive>
+  <languages>Common, Draconic</languages>
+  <trait>
+    <name>Legendary Resistance (3/Day)</name>
+    <text>If the hollow dragon fails a saving throw, it can choose to succeed instead.</text>
+  </trait>
+  <trait>
+    <name>Reconstruction</name>
+    <text>When the hollow dragon is reduced to 0 hit points, its body breaks into nine pieces: two arms, two legs, two wings, a tail, a torso, and a head. Each piece is a Large object with AC 19, 27 hit points, and immunity to psychic and poison damage. After 1d6 days, if all pieces are still within 6 miles of each other, they all teleport to the location of the head piece and merge with it, whereupon the hollow dragon regains all its hit points and becomes active again.</text>
+  </trait>
+  <action>
+    <name>Multiattack</name>
+    <text>The hollow dragon makes one Bite attack and two Claw attacks, and it can use Sapping Presence.</text>
+    <attack>Multiattack</attack>
+  </action>
+  <action>
+    <name>Bite</name>
+    <text>Melee Weapon Attack +12 to hit to hit, reach 10 ft., one target. Hit:17 (2d10 + 6) piercing damage plus 9 (2d8) radiant damage.</text>
+    <attack>Bite|+12|2d10+6</attack>
+  </action>
+  <action>
+    <name>Claw</name>
+    <text>Melee Weapon Attack +12 to hit to hit, reach 5 ft., one target. Hit:13 (2d6 + 6) slashing damage.</text>
+    <attack>Claw|+12|2d6+6</attack>
+  </action>
+  <action>
+    <name>Sapping Presence</name>
+    <text>Each creature of the hollow dragon's choice within 60 feet of it must make a DC 19 Wisdom saving throw. On a failed save, the creature's speed is halved and it has disadvantage on attack rolls until the end of its next turn. On a successful save, the creature is immune to this hollow dragon's Sapping Presence for 24 hours.</text>
+    <attack>Sapping Presence</attack>
+  </action>
+  <action>
+    <name>Radiant Breath (Recharge 5–6)</name>
+    <text>The hollow dragon exhales radiant flames in a 60-foot cone. Each creature in that area must make a DC 19 Dexterity saving throw, taking 54 (12d8) radiant damage on a failed save, or half as much damage on a successful one.</text>
+    <attack>Radiant Breath (Recharge 5–6)</attack>
+  </action>
+  <legendary>
+    <name>Claw</name>
+    <text>The hollow dragon makes one Claw attack.</text>
+    <attack>Claw</attack>
+  </legendary>
+  <legendary>
+    <name>Ghostly Binding (Costs 2 Actions)</name>
+    <text>The hollow dragon creates ethereal bindings around a creature it can see within 60 feet of it. The target must succeed on a DC 19 Strength saving throw or be restrained until the end of the dragon's next turn.</text>
+    <attack>Ghostly Binding (Costs 2 Actions)</attack>
+  </legendary>
+  <legendary>
+    <name>Booming Scales (Costs 3 Actions)</name>
+    <text>A sudden loud ringing noise, painfully intense, erupts from the hollow dragon's frame. Each creature within 10 feet of the hollow dragon must make a DC 19 Constitution saving throw, taking 24 (7d6) thunder damage on a failed save, or half as much damage on a successful one.</text>
+    <attack>Booming Scales (Costs 3 Actions)</attack>
+  </legendary>
+  <traitTags>
+    <tag>Legendary Resistances</tag>
+  </traitTags>
+  <senseTags>
+    <tag>B</tag>
+    <tag>SD</tag>
+  </senseTags>
+  <actionTags>
+    <tag>Breath Weapon</tag>
+    <tag>Multiattack</tag>
+  </actionTags>
+  <languageTags>
+    <tag>C</tag>
+    <tag>DR</tag>
+  </languageTags>
+  <damageTags>
+    <tag>P</tag>
+    <tag>R</tag>
+    <tag>S</tag>
+    <tag>T</tag>
+  </damageTags>
+  <miscTags>
+    <tag>AOE</tag>
+    <tag>MW</tag>
+    <tag>RCH</tag>
+  </miscTags>
+  <conditionInflict>
+    <condition>restrained</condition>
+  </conditionInflict>
+  <savingThrowForced>
+    <throwType>constitution</throwType>
+    <throwType>dexterity</throwType>
+    <throwType>strength</throwType>
+    <throwType>wisdom</throwType>
+  </savingThrowForced>
+  <hasToken>true</hasToken>
+  <hasFluff>true</hasFluff>
+  <hasFluffImages>true</hasFluffImages>
+  <description/>
+</monster>
 
 </compendium>
