@@ -175,22 +175,22 @@ const useMonsterHooks = () => {
       }
       // Agregar variantes
       if (json.variant) {
-        const variants = xmlObj.ele("description");
+      
         json.variant.forEach((variant: any) => {
-          variants.ele("text", transformarStringAtaque(variant.name));
+          xmlObj.ele("description", transformarStringAtaque(variant.name));
           variant.entries.forEach((entry: any) => {
             if (entry.type === "entries") {
               entry.entries.forEach((entryText: any) => {
                 if (typeof entryText === "string") {
-                  variants.ele("text", transformarStringAtaque(entryText));
+                  xmlObj.ele("description", transformarStringAtaque(entryText));
                 } else {
                   entryText.items.forEach((moreEntries: any) => {
-                    variants.ele(
-                      "text",
+                    xmlObj.ele(
+                      "description",
                       transformarStringAtaque(moreEntries.name)
                     );
-                    variants.ele(
-                      "text",
+                    xmlObj.ele(
+                      "description",
                       transformarStringAtaque(moreEntries.entries.join(""))
                     );
                   });
@@ -198,11 +198,8 @@ const useMonsterHooks = () => {
               });
             } else if (entry.type === "list") {
               entry.items.forEach((item: any) => {
-                const itemElement = variants.ele("item", {
-                  name: item.name,
-                });
                 item.entries.forEach((itemEntry: string) => {
-                  itemElement.ele("text", transformarStringAtaque(itemEntry));
+                  xmlObj.ele("description", transformarStringAtaque(itemEntry));
                 });
               });
             }
